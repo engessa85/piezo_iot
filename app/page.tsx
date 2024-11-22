@@ -9,7 +9,7 @@ import { TbCircuitVoltmeter } from "react-icons/tb";
 import { MdEnergySavingsLeaf } from "react-icons/md";
 
 export default function Home() {
-  const [randomValue, setRandomValue] = useState<number | any>(null); // State to store the database value
+  const [randomValue, setRandomValue] = useState<number>(0); // State to store the database value
   const [step, setStep] = useState<number>(0);
   const [energy, setEnergy] = useState<number>(0);
   const [changeColor, setchangeColor] = useState<boolean>(true);
