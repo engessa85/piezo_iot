@@ -1,101 +1,151 @@
-import Image from "next/image";
+"use client";
+
+import { ref, onValue } from "firebase/database";
+import { useState, useEffect } from "react";
+import { database } from "./fireBaseConfig"; // Ensure this is your Firebase configuration file
+
+import { CgPushChevronDownO } from "react-icons/cg";
+import { TbCircuitVoltmeter } from "react-icons/tb";
+import { MdEnergySavingsLeaf } from "react-icons/md";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [randomValue, setRandomValue] = useState<number | any>(null); // State to store the database value
+  const [step, setStep] = useState<number>(0);
+  const [energy, setEnergy] = useState<number>(0);
+  const [changeColor, setchangeColor] = useState<boolean>(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const valueRef = ref(database, "db/randomValue"); // Reference to your database node
+    const unsubscribe = onValue(valueRef, (snapshot) => {
+      const value = snapshot.val(); // Get the value from the snapshot
+      setRandomValue(value); // Update the state with the database value
+      
+      setchangeColor(false);
+    });
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (randomValue !== null) {
+      setEnergy(randomValue * (randomValue / 1000) * 0.2 * 1000);
+    }
+
+    if(randomValue > 0.0001){
+      setStep((prevValue) => prevValue + 1);
+  
+    }
+  }, [randomValue]);
+
+
+  
+
+  const roundToDecimals = (num: number, decimalPlaces: number) => {
+    const factor = Math.pow(10, decimalPlaces);
+    return Math.round(num * factor) / factor;
+  };
+
+  // const batteryLevel = Math.min((step / 100) * 100, 100);
+  const batteryLevel = 2.1 + ((step * 0.3) / 700);
+
+  return (
+    <div className="w-full h-[calc(100vh-156px)] bg-slate-50">
+      <div className="px-6 py-6">
+        <div className="grid grid-cols-4 gap-10">
+          <div className="col-span-2 space-y-4">
+            <div className="bg-white rounded-lg p-6">
+              <div className="flex flex-row items-center gap-10">
+                <div className="flex items-center gap-3">
+                  <CgPushChevronDownO size={50} color="#ADD8E6" />
+                  <div>
+                    <h1 className="text-slate-800 text-xl font-extrabold tracking-wide mb-2">
+                      Step Counter
+                    </h1>
+                    <p className="text-sm text-slate-400">
+                      Counting step numbers...
+                    </p>
+                  </div>
+                </div>
+
+                <div className="ml-10 border border-slate-100 p-5 rounded-md">
+                  <p className="font-bold text-xl text-blue-500">
+                    {step !== null ? step : "Loading..."}
+                    <span className="ml-2 text-sm text-slate-400">Counts</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex gap-3 items-center">
+                  <TbCircuitVoltmeter size={60} color="#ADD8E6" />
+                  <div>
+                    <h1 className="text-slate-800 text-xl font-extrabold tracking-wide mb-2">
+                      Impulse Voltage
+                    </h1>
+                    <p className="text-sm text-slate-400">
+                      Reading currnet voltage...
+                    </p>
+                  </div>
+                </div>
+                <div className="ml-10 border border-slate-100 p-5 rounded-md">
+                  <p className="font-bold text-xl text-blue-500">
+                    {randomValue !== null ? randomValue : "Loading..."}
+                    <span className="ml-2 text-sm text-slate-400">Volts</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-6">
+              <div className="flex flex-row items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <MdEnergySavingsLeaf size={50} color="#ADD8E6" />
+                  <div>
+                    <h1 className="text-slate-800 text-xl font-extrabold tracking-wide mb-2">
+                      Generated Energy
+                    </h1>
+                    <p className="text-sm text-slate-400">
+                      Calculated energy...
+                    </p>
+                  </div>
+                </div>
+                <div className="ml-10 border border-slate-100 p-5 rounded-md">
+                  <p className={`font-bold text-xl text-blue-500`}>
+                    {randomValue !== 0
+                      ? roundToDecimals(energy, 2)
+                      : "Loading..."}
+                    <span className="ml-2 text-sm text-slate-400">mJ</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-2">
+            <div className="bg-white rounded-lg p-6">
+              <h1 className="text-slate-800 text-xl font-extrabold tracking-wide mb-2">
+                Battery Charging
+              </h1>
+              <p className="text-sm text-slate-400">
+                Monitoring battery voltage level...
+              </p>
+              <hr className="w-[95%] my-4" />
+              <div className="flex items-center p-4 justify-center">
+                <div className="bg-gray-200 w-[30%] h-[300px] rounded-lg flex flex-col-reverse items-center">
+                  <div
+                    style={{ height: `${batteryLevel}%` }}
+                    className="bg-green-400 w-full text-center p-3 border border-gray-400 flex items-center justify-center"
+                  >
+                    <p className="text-gray-700 text-sm">{`${roundToDecimals(batteryLevel,2)}%`}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
