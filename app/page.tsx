@@ -12,7 +12,7 @@ export default function Home() {
   const [randomValue, setRandomValue] = useState<number>(0); // State to store the database value
   const [step, setStep] = useState<number>(0);
   const [energy, setEnergy] = useState<number>(0);
-  const [changeColor, setchangeColor] = useState<boolean>(true);
+  
 
   useEffect(() => {
     const valueRef = ref(database, "db/randomValue"); // Reference to your database node
@@ -20,7 +20,6 @@ export default function Home() {
       const value = snapshot.val(); // Get the value from the snapshot
       setRandomValue(value); // Update the state with the database value
       
-      setchangeColor(false);
     });
 
     // Cleanup listener on component unmount
