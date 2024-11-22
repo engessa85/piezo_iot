@@ -137,7 +137,7 @@ export default function Home() {
                     style={{ height: `${batteryLevel}%` }}
                     className="bg-green-400 w-full text-center p-3 border border-gray-400 flex items-center justify-center"
                   >
-                    <p className="text-gray-700 text-sm">{`${roundToDecimals(batteryLevel,2)}%`}</p>
+                    <p className="text-gray-700 text-sm">{`${roundToDecimals(batteryLevel,7)}%`}</p>
                   </div>
                 </div>
               </div>
