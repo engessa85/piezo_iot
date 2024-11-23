@@ -47,6 +47,7 @@ export default function Home() {
 
   // const batteryLevel = Math.min((step / 100) * 100, 100);
   const batteryLevel = 2.1 + ((step * 0.3) / 700);
+  // const batteryLevel = Math.min(2.1 + ((step * 0.3) / 700), 3);
 
   return (
     <div className="w-full h-[calc(100vh-156px)] bg-slate-50">
@@ -134,10 +135,12 @@ export default function Home() {
               <div className="flex items-center p-4 justify-center">
                 <div className="bg-gray-200 w-[30%] h-[300px] rounded-lg flex flex-col-reverse items-center">
                   <div
-                    style={{ height: `${batteryLevel}%` }}
+                    style={{
+                      height: `${(batteryLevel / 3) * 300}px`, // Map voltage to height
+                    }}
                     className="bg-green-400 w-full text-center p-3 border border-gray-400 flex items-center justify-center"
                   >
-                    <p className="text-gray-700 text-sm">{`${roundToDecimals(batteryLevel,7)}%`}</p>
+                    <p className="text-gray-700 text-sm">{`${batteryLevel.toFixed(4)} V`}</p>
                   </div>
                 </div>
               </div>
