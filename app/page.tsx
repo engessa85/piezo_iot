@@ -1,7 +1,7 @@
 "use client";
 
 import { ref, onValue } from "firebase/database";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { database } from "./fireBaseConfig"; // Ensure this is your Firebase configuration file
 
 import { CgPushChevronDownO } from "react-icons/cg";
