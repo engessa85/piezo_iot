@@ -1,7 +1,7 @@
 "use client";
 
 import { ref, onValue } from "firebase/database";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { database } from "./fireBaseConfig"; // Ensure this is your Firebase configuration file
 
 import { CgPushChevronDownO } from "react-icons/cg";
@@ -12,6 +12,13 @@ export default function Home() {
   const [randomValue, setRandomValue] = useState<number>(0); // State to store the database value
   const [step, setStep] = useState<number>(0);
   const [energy, setEnergy] = useState<number>(0);
+  const [current, setCurrent] = useState(0)
+
+  const minCurrent = 10
+  const maxCurrent = 20
+
+
+  // float current = minCurrent + ((voltage / referenceVoltage) * (maxCurrent - minCurrent));
   
 
   useEffect(() => {
@@ -19,6 +26,8 @@ export default function Home() {
     const unsubscribe = onValue(valueRef, (snapshot) => {
       const value = snapshot.val(); // Get the value from the snapshot
       setRandomValue(value); // Update the state with the database value
+      
+      
       
     });
 
@@ -28,7 +37,8 @@ export default function Home() {
 
   useEffect(() => {
     if (randomValue !== null) {
-      setEnergy(randomValue * (randomValue / 1000) * 0.2 * 1000);
+      setCurrent((minCurrent + ((randomValue/3.3)+(maxCurrent-minCurrent))))
+      setEnergy(randomValue * current *0.2);
     }
 
     if(randomValue > 0.0001){
@@ -117,7 +127,7 @@ export default function Home() {
                     {randomValue !== 0
                       ? roundToDecimals(energy, 2)
                       : "Loading..."}
-                    <span className="ml-2 text-sm text-slate-400">mJ</span>
+                    <span className="ml-2 text-sm text-slate-400">uJ</span>
                   </p>
                 </div>
               </div>
